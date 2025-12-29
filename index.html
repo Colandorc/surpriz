@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Merhaba Yeldanur</title>
 
+  <!-- Fontlar -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,28 +14,40 @@
     :root{
       --txt:#f6f7ff;
       --muted:rgba(246,247,255,.74);
-      --glass:rgba(10,12,20,.55);
+      --glass:rgba(10,12,20,.52);
       --stroke:rgba(255,255,255,.14);
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
+
     body{
       margin:0;
       color:var(--txt);
       overflow:hidden;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: radial-gradient(1200px 700px at 20% 10%, #141a3a 0%, transparent 55%),
-                  radial-gradient(1000px 700px at 80% 80%, #0b2a2a 0%, transparent 55%),
-                  linear-gradient(180deg, #02030a 0%, #060716 55%, #02020a 100%);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, #141a3a 0%, transparent 55%),
+        radial-gradient(1000px 700px at 80% 80%, #0b2a2a 0%, transparent 55%),
+        linear-gradient(180deg, #02030a 0%, #060716 55%, #02020a 100%);
     }
 
+    /* Arka plan yıldız canvas */
     canvas#sky{
       position:fixed; inset:0;
       width:100%; height:100%;
       display:block;
     }
 
+    /* Havai fişek canvas */
+    canvas#fx{
+      position:fixed; inset:0;
+      width:100%; height:100%;
+      display:block;
+      pointer-events:none;
+    }
+
+    /* Vignette */
     .vignette{
       position:fixed; inset:-40px;
       background:
@@ -48,8 +61,8 @@
       position:fixed;
       right: 7vw;
       top: 8vh;
-      width: 120px;
-      height: 120px;
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
       background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,.95) 0%, rgba(245,247,255,.92) 35%, rgba(210,220,255,.85) 60%, rgba(160,175,220,.55) 100%);
@@ -62,7 +75,6 @@
       opacity:.95;
       overflow:hidden;
     }
-    /* krater hissi */
     .moon::before{
       content:"";
       position:absolute; inset:-10px;
@@ -75,39 +87,69 @@
       opacity:.55;
       transform: rotate(10deg);
     }
-    /* ayın gölgeli tarafı */
     .moon::after{
       content:"";
       position:absolute; inset:0;
       background: radial-gradient(circle at 25% 35%, transparent 0 55%, rgba(0,0,0,.18) 75%, rgba(0,0,0,.35) 100%);
       opacity:.55;
     }
-
     @media (max-width:420px){
-      .moon{ width:90px; height:90px; right:5vw; top:7vh; }
+      .moon{ width:86px; height:86px; right:5vw; top:7vh; }
     }
 
-    /* Kayan yıldızlar */
+    /* Kayan yıldız layer */
     .shooting-layer{
       position:fixed; inset:0;
       pointer-events:none;
       overflow:hidden;
       z-index:1;
     }
+
+    /* Daha gerçekçi, yavaş, iz bırakan kayan yıldız */
     .shooting-star{
       position:absolute;
-      width:260px;
-      height:2px;
-      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.95), rgba(255,255,255,0));
-      filter: drop-shadow(0 0 10px rgba(255,255,255,.55));
-      opacity:0;
-      transform: rotate(-20deg);
-      animation: shoot 1.35s ease-in-out forwards;
+      width: min(68vw, 520px);
+      height: 2px;
+      border-radius: 999px;
+      opacity: 0;
+      transform: rotate(-18deg);
+      filter: drop-shadow(0 0 10px rgba(255,255,255,.55)) drop-shadow(0 0 22px rgba(200,220,255,.22));
+      animation: shoot 3.4s cubic-bezier(.16,.84,.22,1) forwards;
+    }
+    .shooting-star::before{
+      content:"";
+      position:absolute;
+      left:-55%;
+      top:50%;
+      transform: translateY(-50%);
+      width: 140%;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0),
+        rgba(255,255,255,.10),
+        rgba(255,255,255,.55),
+        rgba(255,255,255,.95)
+      );
+      filter: blur(1px);
+      opacity:.85;
+    }
+    .shooting-star::after{
+      content:"";
+      position:absolute;
+      right:6px;
+      top:50%;
+      transform: translateY(-50%);
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,.35) 55%, rgba(255,255,255,0) 75%);
+      filter: drop-shadow(0 0 10px rgba(255,255,255,.6));
     }
     @keyframes shoot{
-      0%   { opacity:0; transform: translate3d(0,0,0) rotate(-20deg); }
-      10%  { opacity:1; }
-      100% { opacity:0; transform: translate3d(560px, 280px, 0) rotate(-20deg); }
+      0%{ opacity:0; transform: translate3d(0,0,0) rotate(-18deg); }
+      12%{ opacity:1; }
+      100%{ opacity:0; transform: translate3d(72vw, 34vh, 0) rotate(-18deg); }
     }
 
     /* Kart */
@@ -134,7 +176,7 @@
 
     .title{
       font-family: "Playfair Display", serif;
-      font-size: 38px;
+      font-size: 36px;
       letter-spacing: .2px;
       margin: 6px 0 10px;
       text-shadow: 0 10px 40px rgba(0,0,0,.6);
@@ -142,10 +184,10 @@
     }
 
     .line{
-      font-size: 20px;
-      line-height: 1.55;
+      font-size: 19px;
+      line-height: 1.6;
       margin: 10px 0 14px;
-      min-height: 84px;
+      min-height: 92px;
       white-space: pre-line;
       display:flex;
       align-items:center;
@@ -175,6 +217,7 @@
       cursor:pointer;
       font-size: 14px;
       transition: transform .18s ease, background .18s ease, opacity .18s ease;
+      user-select:none;
     }
     .btn.primary{ background: rgba(255,255,255,.12); }
     .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); }
@@ -183,14 +226,16 @@
     #choiceRow{ display:none; }
 
     @media (max-width: 420px){
-      .title{ font-size: 30px; }
-      .line{ font-size: 18px; min-height: 92px; }
+      .title{ font-size: 28px; }
+      .line{ font-size: 17px; min-height: 100px; }
+      .btn{ padding: 12px 16px; }
     }
   </style>
 </head>
 
 <body>
   <canvas id="sky"></canvas>
+  <canvas id="fx"></canvas>
   <div class="shooting-layer" id="shootingLayer"></div>
   <div class="moon" aria-hidden="true"></div>
   <div class="vignette"></div>
@@ -198,7 +243,7 @@
   <main class="wrap">
     <section class="card" id="tapArea">
       <div class="title" id="title">Merhaba Yeldanur</div>
-      <div class="line" id="line"> </div>
+      <div class="line" id="line"></div>
       <div class="hint" id="hint">Devam etmek için tıkla ✨</div>
 
       <div class="row" id="choiceRow">
@@ -214,85 +259,97 @@
   </audio>
 
   <script>
-    /* ---------- CANVAS YILDIZLAR ---------- */
-    const canvas = document.getElementById("sky");
-    const ctx = canvas.getContext("2d");
-    let W, H, DPR;
-    let stars = [];
+    /* ----------------- YILDIZLI GÖKYÜZÜ (SABİT + PARLAMA) ----------------- */
+    const sky = document.getElementById("sky");
+    const sctx = sky.getContext("2d");
+    let SW, SH, SDPR, stars = [];
+
+    const fx = document.getElementById("fx");
+    const fctx = fx.getContext("2d");
+    let FW, FH, FDPR;
 
     function rand(min,max){ return Math.random()*(max-min)+min; }
 
-    function resize(){
-      DPR = Math.min(window.devicePixelRatio || 1, 2);
-      W = canvas.width = Math.floor(window.innerWidth * DPR);
-      H = canvas.height = Math.floor(window.innerHeight * DPR);
-      canvas.style.width = window.innerWidth + "px";
-      canvas.style.height = window.innerHeight + "px";
+    function resizeAll(){
+      SDPR = Math.min(window.devicePixelRatio || 1, 2);
+      SW = sky.width = Math.floor(window.innerWidth * SDPR);
+      SH = sky.height = Math.floor(window.innerHeight * SDPR);
+      sky.style.width = window.innerWidth + "px";
+      sky.style.height = window.innerHeight + "px";
       makeStars();
+
+      FDPR = SDPR;
+      FW = fx.width = Math.floor(window.innerWidth * FDPR);
+      FH = fx.height = Math.floor(window.innerHeight * FDPR);
+      fx.style.width = window.innerWidth + "px";
+      fx.style.height = window.innerHeight + "px";
     }
 
     function makeStars(){
-      const count = Math.floor((window.innerWidth * window.innerHeight) / 8500);
+      const count = Math.floor((window.innerWidth * window.innerHeight) / 7000); // mobilde daha dolu
       stars = Array.from({length: count}, () => ({
-        x: Math.random()*W,
-        y: Math.random()*H,
-        r: rand(0.6, 1.9) * DPR,
-        a: rand(0.18, 0.95),
-        tw: rand(0.004, 0.02),
+        x: Math.random()*SW,
+        y: Math.random()*SH,
+        r: rand(0.6, 1.8) * SDPR,
+        base: rand(0.15, 0.9),
+        tw: rand(0.002, 0.010), // daha yavaş twinkle
         ph: rand(0, Math.PI*2),
       }));
     }
 
-    function draw(){
-      ctx.clearRect(0,0,W,H);
+    function drawSky(){
+      sctx.clearRect(0,0,SW,SH);
 
-      // nebula
-      const g1 = ctx.createRadialGradient(W*0.22, H*0.18, 0, W*0.22, H*0.18, W*0.65);
+      // hafif nebula
+      const g1 = sctx.createRadialGradient(SW*0.22, SH*0.18, 0, SW*0.22, SH*0.18, SW*0.65);
       g1.addColorStop(0, "rgba(120,140,255,0.10)");
       g1.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
+      sctx.fillStyle = g1; sctx.fillRect(0,0,SW,SH);
 
-      const g2 = ctx.createRadialGradient(W*0.78, H*0.72, 0, W*0.78, H*0.72, W*0.60);
+      const g2 = sctx.createRadialGradient(SW*0.78, SH*0.72, 0, SW*0.78, SH*0.72, SW*0.60);
       g2.addColorStop(0, "rgba(90,255,220,0.07)");
       g2.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+      sctx.fillStyle = g2; sctx.fillRect(0,0,SW,SH);
 
       const t = performance.now();
-      for(const s of stars){
-        const tw = (Math.sin(t*s.tw + s.ph) + 1) / 2;
-        const alpha = Math.min(1, s.a * (0.55 + tw*0.65));
+      for(const st of stars){
+        const tw = (Math.sin(t*st.tw + st.ph) + 1) / 2; // 0..1
+        const a = Math.min(1, st.base * (0.65 + tw*0.55));
 
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-        ctx.shadowBlur = 10 * DPR;
-        ctx.shadowColor = `rgba(255,255,255,${alpha})`;
-        ctx.arc(s.x, s.y, s.r*(0.75 + tw*0.5), 0, Math.PI*2);
-        ctx.fill();
+        sctx.beginPath();
+        sctx.fillStyle = `rgba(255,255,255,${a})`;
+        sctx.shadowBlur = 12 * SDPR;
+        sctx.shadowColor = `rgba(255,255,255,${a})`;
+        sctx.arc(st.x, st.y, st.r*(0.85 + tw*0.35), 0, Math.PI*2);
+        sctx.fill();
       }
 
-      requestAnimationFrame(draw);
+      requestAnimationFrame(drawSky);
     }
 
-    window.addEventListener("resize", resize);
-    resize();
-    draw();
+    window.addEventListener("resize", resizeAll);
+    resizeAll();
+    drawSky();
 
-    /* ---------- KAYAN YILDIZ ---------- */
+    /* ----------------- KAYAN YILDIZ (YAVAŞ + İZLİ) ----------------- */
     const shootingLayer = document.getElementById("shootingLayer");
 
     function spawnShootingStar(){
       const star = document.createElement("div");
       star.className = "shooting-star";
-      const startX = Math.random() * (window.innerWidth * 0.55);
-      const startY = Math.random() * (window.innerHeight * 0.35);
+
+      const startX = Math.random() * (window.innerWidth * 0.30);
+      const startY = Math.random() * (window.innerHeight * 0.22);
+
       star.style.left = startX + "px";
       star.style.top = startY + "px";
+
       shootingLayer.appendChild(star);
       star.addEventListener("animationend", () => star.remove());
     }
 
     function scheduleShooting(){
-      const delay = Math.floor(rand(6500, 14000));
+      const delay = Math.floor(rand(9000, 18000)); // seyrek + doğal
       setTimeout(() => {
         spawnShootingStar();
         scheduleShooting();
@@ -300,7 +357,7 @@
     }
     scheduleShooting();
 
-    /* ---------- METİN + BUTON MANTIĞI ---------- */
+    /* ----------------- METİN + MÜZİK (İLK TIKTA) ----------------- */
     const titleEl = document.getElementById("title");
     const lineEl  = document.getElementById("line");
     const hintEl  = document.getElementById("hint");
@@ -309,7 +366,6 @@
     const yesBtn = document.getElementById("yesBtn");
     const noBtn  = document.getElementById("noBtn");
 
-    // Müzik: ilk tıkta başlasın
     const audio = document.getElementById("audio");
     let musicStarted = false;
 
@@ -318,17 +374,15 @@
       { title: "", line: "Bu aralar keyifsiz olduğunu biliyorum…\nVe yanında olmak istiyorum.", hint: "Devam etmek için tıkla", choice: false },
       { title: "", line: "Bugün akşam işlerin bittiğinde…\n5 dakika bile olsa seni görmek ve yanında olmak istiyorum.", hint: "Seçimini yap 😊", choice: true },
     ];
-
     let sceneIndex = 0;
 
     function setScene(idx){
       const s = scenes[idx];
       titleEl.textContent = s.title || " ";
-      lineEl.textContent  = s.line || " ";
-      hintEl.textContent  = s.hint || " ";
+      lineEl.textContent  = s.line  || " ";
+      hintEl.textContent  = s.hint  || " ";
       choiceRow.style.display = s.choice ? "flex" : "none";
     }
-
     setScene(sceneIndex);
 
     async function startMusicOnce(){
@@ -337,15 +391,13 @@
         await audio.play();
         musicStarted = true;
       }catch(e){
-        // Bazı tarayıcılarda ilk tık bile yetmeyebilir; ikinci tıkta dener.
+        // bazı cihazlarda ikinci tıkta başlayabilir
       }
     }
 
     tapArea.addEventListener("click", async (e) => {
-      // butona tıklayınca kart click'i tetiklenmesin
       if(e.target.tagName.toLowerCase() === "button") return;
 
-      // ilk tıkta müzik başlat
       await startMusicOnce();
 
       if(sceneIndex < scenes.length - 1){
@@ -354,13 +406,14 @@
       }
     });
 
-    // EVET/HAYIR ölçek
+    /* ----------------- EVET/HAYIR BÜYÜK-KÜÇÜK ----------------- */
     let yesScale = 1;
     let noScale  = 1;
 
     function applyScales(){
       yesBtn.style.transform = `scale(${yesScale})`;
       noBtn.style.transform  = `scale(${noScale})`;
+
       if(noScale <= 0.25){
         noBtn.style.opacity = "0";
         noBtn.style.pointerEvents = "none";
@@ -369,25 +422,109 @@
         noBtn.style.pointerEvents = "auto";
       }
     }
+    applyScales();
 
     noBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
       await startMusicOnce();
+
       noScale  = Math.max(0.2, noScale * 0.78);
-      yesScale = Math.min(1.95, yesScale * 1.12);
+      yesScale = Math.min(2.0, yesScale * 1.12);
       applyScales();
     });
+
+    /* ----------------- HAVAİ FİŞEKLER 🎆 ----------------- */
+    let fireworksOn = false;
+    const particles = [];
+
+    function burst(x, y){
+      const n = Math.floor(rand(60, 90));
+      const baseHue = rand(180, 340); // pembe-mor-mavi arası daha romantik
+      for(let i=0;i<n;i++){
+        const ang = rand(0, Math.PI*2);
+        const spd = rand(1.2, 4.8) * FDPR;
+        particles.push({
+          x: x*FDPR,
+          y: y*FDPR,
+          vx: Math.cos(ang)*spd,
+          vy: Math.sin(ang)*spd,
+          life: rand(40, 70),
+          max: 70,
+          r: rand(1.2, 2.6)*FDPR,
+          hue: baseHue + rand(-25, 25)
+        });
+      }
+    }
+
+    function drawFireworks(){
+      fctx.clearRect(0,0,FW,FH);
+
+      // hafif iz bırakma (motion trail)
+      fctx.fillStyle = "rgba(0,0,0,0.18)";
+      fctx.fillRect(0,0,FW,FH);
+
+      for(let i=particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.life -= 1;
+
+        p.vx *= 0.985;
+        p.vy *= 0.985;
+        p.vy += 0.02 * FDPR; // yerçekimi
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        const alpha = Math.max(0, p.life / p.max);
+        fctx.beginPath();
+        fctx.fillStyle = `hsla(${p.hue}, 90%, 70%, ${alpha})`;
+        fctx.shadowBlur = 18 * FDPR;
+        fctx.shadowColor = `hsla(${p.hue}, 90%, 70%, ${alpha})`;
+        fctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        fctx.fill();
+
+        if(p.life <= 0) particles.splice(i,1);
+      }
+
+      if(fireworksOn || particles.length > 0){
+        requestAnimationFrame(drawFireworks);
+      }else{
+        fctx.clearRect(0,0,FW,FH);
+      }
+    }
+
+    function startFireworks(){
+      if(fireworksOn) return;
+      fireworksOn = true;
+
+      // ilk patlama
+      burst(window.innerWidth*0.55, window.innerHeight*0.35);
+
+      // 4-6 saniye boyunca aralıklı patlamalar
+      const endAt = Date.now() + 5200;
+      (function loop(){
+        if(Date.now() > endAt){
+          fireworksOn = false;
+          return;
+        }
+        burst(rand(0.25,0.75)*window.innerWidth, rand(0.18,0.52)*window.innerHeight);
+        setTimeout(loop, rand(500, 950));
+      })();
+
+      drawFireworks();
+    }
 
     yesBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
       await startMusicOnce();
+
+      // havai fişek başlat
+      startFireworks();
+
       titleEl.textContent = "🤍";
       lineEl.textContent = "Tamam.\nİşin bittiğinde haber ver…\nBen geliyorum.";
       hintEl.textContent = "Bu sayfa burada kalsın 🙂";
       choiceRow.style.display = "none";
     });
-
-    applyScales();
   </script>
 </body>
 </html>

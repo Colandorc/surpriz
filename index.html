@@ -200,10 +200,6 @@
 
   <div id="dbg">[1/3]</div>
 
-  <audio id="audio" loop>
-    <source src="music.mp3" type="audio/mpeg" />
-  </audio>
-
   <script>
     /* ---------- SAHNE + TIK (EN SAĞLAM HALİ) ---------- */
     const tTitle = document.getElementById("tTitle");
@@ -213,7 +209,6 @@
     const yesBtn = document.getElementById("yesBtn");
     const noBtn  = document.getElementById("noBtn");
     const dbg    = document.getElementById("dbg");
-    const audio  = document.getElementById("audio");
 
     const scenes = [
       { title:"Merhaba Yeldanur", line:"Devam etmek için tıkla ✨", hint:"", choice:false },
@@ -241,13 +236,6 @@
     }
     setScene(idx);
 
-    // Müzik: ilk tıkta başlasın ama sahneyi ASLA bekletmesin
-    let musicStarted = false;
-    function startMusicOnce(){
-      if(musicStarted) return;
-      audio.play().then(() => { musicStarted = true; }).catch(() => {});
-    }
-
     function advance(){
       if(idx < scenes.length - 1){
         idx++;
@@ -262,7 +250,6 @@
     // EKRANIN HER YERİNDEN YAKALA (CAPTURE) => kesin çalışır
     function globalTap(e){
       if(isButtonTarget(e)) return;
-      startMusicOnce();
       advance();
     }
     document.addEventListener("pointerdown", globalTap, true);
@@ -272,7 +259,6 @@
     // Hayır -> tamamen yok olsun
     noBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      startMusicOnce();
       noBtn.remove();
       yesBtn.style.transform = "scale(1.12)";
       setTimeout(()=> yesBtn.style.transform = "scale(1)", 220);
@@ -464,7 +450,6 @@
 
     yesBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      startMusicOnce();
       startFireworks();
       tTitle.textContent = "🤍";
       tTitle.classList.remove("hidden");

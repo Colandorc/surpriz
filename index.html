@@ -12,7 +12,7 @@
   <style>
     :root{
       --txt:#f6f7ff;
-      --muted:rgba(246,247,255,.72);
+      --muted:rgba(246,247,255,.75);
       --glass:rgba(10,12,20,.52);
       --stroke:rgba(255,255,255,.14);
     }
@@ -20,8 +20,8 @@
     html,body{height:100%}
     body{
       margin:0;
-      color:var(--txt);
       overflow:hidden;
+      color:var(--txt);
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       background:
         radial-gradient(1200px 700px at 20% 10%, #141a3a 0%, transparent 55%),
@@ -29,7 +29,7 @@
         linear-gradient(180deg, #02030a 0%, #060716 55%, #02020a 100%);
     }
 
-    /* Canvaslar tıklamayı yemesin */
+    /* Canvaslar tıklamayı YUTMASIN */
     canvas{
       position:fixed; inset:0;
       width:100%; height:100%;
@@ -43,9 +43,9 @@
         radial-gradient(circle at center, transparent 40%, rgba(0,0,0,.78) 100%),
         radial-gradient(800px 500px at 70% 20%, rgba(255,255,255,.05), transparent 65%);
       pointer-events:none;
+      z-index:1;
     }
 
-    /* Ay */
     .moon{
       position:fixed;
       right: 7vw;
@@ -59,7 +59,7 @@
       opacity:.95;
       overflow:hidden;
       pointer-events:none;
-      z-index:1;
+      z-index:2;
     }
     .moon::before{
       content:"";
@@ -86,7 +86,7 @@
       display:grid;
       place-items:center;
       padding:22px;
-      z-index:2;
+      z-index:3;
     }
     .card{
       width:min(720px, 94vw);
@@ -104,29 +104,16 @@
     .title{
       font-family: "Playfair Display", serif;
       font-size: 28px;
-      margin: 6px 0 10px;
+      margin: 6px 0 12px;
       text-shadow: 0 10px 40px rgba(0,0,0,.6);
-      min-height:38px;
     }
-
     .line{
-      font-size: 17px;
-      line-height: 1.65;
-      margin: 10px 0 14px;
-      min-height: 110px;
-      white-space: pre-line;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 0 6px;
-      transition: opacity .16s ease;
-    }
-
-    .hint{
-      font-size: 13px;
+      font-size: 16px;
       color: var(--muted);
-      margin-top: 6px;
-      min-height:18px;
+      margin: 0;
+      white-space: pre-line;
+      line-height: 1.7;
+      min-height: 48px;
     }
 
     .row{
@@ -136,7 +123,6 @@
       flex-wrap:wrap;
       margin-top:16px;
     }
-
     .btn{
       border:1px solid var(--stroke);
       background: rgba(255,255,255,.08);
@@ -145,11 +131,23 @@
       border-radius: 16px;
       cursor:pointer;
       font-size: 14px;
-      transition: transform .18s ease, background .18s ease, opacity .18s ease;
+      transition: transform .18s ease, opacity .18s ease, background .18s ease;
     }
     .btn.primary{ background: rgba(255,255,255,.12); }
-
+    .btn:active{ transform: scale(.99); }
     #choiceRow{ display:none; }
+
+    /* Debug sayaç (istersen sonra sil) */
+    #dbg{
+      position:fixed;
+      right:12px;
+      bottom:10px;
+      font: 12px/1 Inter, Arial;
+      color: rgba(255,255,255,.55);
+      z-index:5;
+      user-select:none;
+      pointer-events:none;
+    }
   </style>
 </head>
 
@@ -163,9 +161,8 @@
 
   <main class="wrap">
     <section class="card" id="card">
-      <div class="title" id="titleText">Merhaba Yeldanur</div>
-      <div class="line" id="lineText">Devam etmek için tıkla ✨</div>
-      <div class="hint" id="hintText"></div>
+      <div class="title" id="tTitle">Merhaba Yeldanur</div>
+      <p class="line" id="tLine">Devam etmek için tıkla ✨</p>
 
       <div class="row" id="choiceRow">
         <button class="btn primary" id="yesBtn" type="button">Evet</button>
@@ -174,85 +171,86 @@
     </section>
   </main>
 
-  <!-- İstersen repoya music.mp3 yükle -->
+  <div id="dbg">[1/3]</div>
+
+  <!-- music.mp3 varsa aynı klasöre koy -->
   <audio id="audio" loop>
     <source src="music.mp3" type="audio/mpeg" />
   </audio>
 
   <script>
-    /* ---------- HELPERS ---------- */
-    const $ = (id) => document.getElementById(id);
-    function rand(min,max){ return Math.random()*(max-min)+min; }
+    // Eğer sayfada JS hata verirse bunu gör:
+    window.onerror = function(msg, src, line, col){
+      alert("JS HATA: " + msg + " (satır " + line + ")");
+    };
 
-    /* ---------- UI ---------- */
-    const titleEl = $("titleText");
-    const lineEl  = $("lineText");
-    const hintEl  = $("hintText");
+    const $ = (id) => document.getElementById(id);
+    const tTitle = $("tTitle");
+    const tLine  = $("tLine");
+    const card   = $("card");
     const choiceRow = $("choiceRow");
     const yesBtn = $("yesBtn");
     const noBtn  = $("noBtn");
+    const dbg    = $("dbg");
     const audio  = $("audio");
 
-    /* ---------- SAHNELER ---------- */
+    // SAHNELER
     const scenes = [
-      { title:"Merhaba Yeldanur", line:"Devam etmek için tıkla ✨", hint:"", choice:false },
-      { title:"", line:"Bu aralar keyifsiz olduğunu biliyorum…\nVe yanında olmak istiyorum.", hint:"(Devam etmek için herhangi bir yere tıkla)", choice:false },
-      { title:"", line:"Bugün akşam işlerin bittiğinde…\n5 dakika bile olsa seni görmek ve yanında olmak istiyorum.", hint:"(Seçimini yap)", choice:true },
+      { title:"Merhaba Yeldanur", line:"Devam etmek için tıkla ✨", choice:false },
+      { title:"", line:"Bu aralar keyifsiz olduğunu biliyorum…\nVe yanında olmak istiyorum.", choice:false },
+      { title:"", line:"Bugün akşam işlerin bittiğinde…\n5 dakika bile olsa seni görmek ve yanında olmak istiyorum.", choice:true },
     ];
-    let sceneIndex = 0;
+    let i = 0;
 
-    function setScene(i){
-      const s = scenes[i];
-      titleEl.textContent = (s.title && s.title.trim()) ? s.title : " ";
-      lineEl.style.opacity = "0";
-      setTimeout(() => {
-        lineEl.textContent = s.line || " ";
-        hintEl.textContent = s.hint || " ";
-        choiceRow.style.display = s.choice ? "flex" : "none";
-        lineEl.style.opacity = "1";
-      }, 90);
+    function setScene(idx){
+      const s = scenes[idx];
+      tTitle.textContent = (s.title && s.title.trim()) ? s.title : " ";
+      tLine.textContent  = (s.line  && s.line.trim())  ? s.line  : " ";
+      choiceRow.style.display = s.choice ? "flex" : "none";
+      dbg.textContent = `[${idx+1}/${scenes.length}]`;
     }
-    setScene(sceneIndex);
+    setScene(i);
 
-    /* ---------- MÜZİK: İLK TIKTA ---------- */
+    // Müzik: ilk tıkta dene
     let musicStarted = false;
     async function startMusicOnce(){
       if(musicStarted) return;
-      try { await audio.play(); musicStarted = true; } catch(e) {}
+      try { await audio.play(); musicStarted = true; } catch(e){}
     }
 
-    function advance(){
-      if(sceneIndex < scenes.length - 1){
-        sceneIndex++;
-        setScene(sceneIndex);
-      }
-    }
-
-    function isButtonClick(ev){
+    function isButton(ev){
       return ev.target && ev.target.closest && ev.target.closest("button");
     }
 
-    /* ---------- TIKLAMA: EN GARANTİSİ (CAPTURE) ---------- */
-    async function globalTap(ev){
-      if(isButtonClick(ev)) return; // butonlara basınca sahne ilerlemesin
+    function advance(){
+      if(i < scenes.length - 1){
+        i++;
+        setScene(i);
+      }
+    }
+
+    // TIK: EN GARANTİSİ (CAPTURE) -> sayfada ne olursa olsun yakalar
+    async function tapHandler(ev){
+      if(isButton(ev)) return;
       await startMusicOnce();
       advance();
     }
-    // Ne olursa olsun yakalasın diye capture=true
-    window.addEventListener("pointerdown", globalTap, true);
-    window.addEventListener("click", globalTap, true);
-    window.addEventListener("touchstart", globalTap, {capture:true, passive:true});
+    window.addEventListener("pointerdown", tapHandler, true);
+    window.addEventListener("click", tapHandler, true);
+    window.addEventListener("touchstart", tapHandler, {capture:true, passive:true});
 
-    /* ---------- HAYIR: BASINCA TAMAMEN YOK OLSUN ---------- */
+    // HAYIR -> tamamen yok olsun
     noBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
       await startMusicOnce();
-      noBtn.remove(); // sadece evet kalsın
+      noBtn.remove();
       yesBtn.style.transform = "scale(1.08)";
       setTimeout(()=> yesBtn.style.transform = "scale(1)", 220);
     });
 
-    /* ---------- ARKAPLAN: YILDIZLAR + METEOR + HAVAİ FİŞEK ---------- */
+    /* ==== Buradan sonrası: yıldız + meteor + havai fişek (senin iyi dediğin mantık) ==== */
+    function rand(min,max){ return Math.random()*(max-min)+min; }
+
     const sky = $("sky"), sctx = sky.getContext("2d");
     const mete = $("meteors"), mctx = mete.getContext("2d");
     const fx = $("fx"), fctx = fx.getContext("2d");
@@ -322,11 +320,9 @@
         len: rand(220, 360)*DPR,
       };
     }
-
     function scheduleMeteor(){
       setTimeout(() => { spawnMeteor(); scheduleMeteor(); }, rand(9000, 18000));
     }
-
     function drawMeteors(){
       mctx.clearRect(0,0,W,H);
       if(meteor){
@@ -369,7 +365,7 @@
       requestAnimationFrame(drawMeteors);
     }
 
-    /* ---- Fireworks ---- */
+    // Fireworks
     const particles = [];
     let fireworksOn = false;
 
@@ -441,16 +437,14 @@
     yesBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
       await startMusicOnce();
-
       startFireworks();
 
-      titleEl.textContent = "🤍";
-      lineEl.textContent  = "Tamam.\nİşin bittiğinde haber ver…\nBen geliyorum.";
-      hintEl.textContent  = " ";
+      tTitle.textContent = "🤍";
+      tLine.textContent  = "Tamam.\nİşin bittiğinde haber ver…\nBen geliyorum.";
       choiceRow.style.display = "none";
     });
 
-    /* start */
+    // start
     resize();
     drawSky();
     scheduleMeteor();

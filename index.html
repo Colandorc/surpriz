@@ -201,7 +201,7 @@
   <div id="dbg">[1/3]</div>
 
   <script>
-    /* ---------- SAHNE + TIK (EN SAĞLAM HALİ) ---------- */
+    /* ---------- SAHNE + TIK ---------- */
     const tTitle = document.getElementById("tTitle");
     const tLine  = document.getElementById("tLine");
     const tHint  = document.getElementById("tHint");
@@ -220,7 +220,6 @@
     function setScene(i){
       const s = scenes[i];
 
-      // başlık yoksa kaybolsun
       const hasTitle = (s.title && s.title.trim());
       tTitle.textContent = hasTitle ? s.title : " ";
       tTitle.classList.toggle("hidden", !hasTitle);
@@ -247,14 +246,21 @@
       return e.target && e.target.closest && e.target.closest("button");
     }
 
-    // EKRANIN HER YERİNDEN YAKALA (CAPTURE) => kesin çalışır
+    // TEK EVENT + KİLİT => 1'den 3'e atlama bitti
+    let tapLock = false;
     function globalTap(e){
       if(isButtonTarget(e)) return;
+
+      // Seçim sahnesindeyken (3. sahne) tık ilerletmesin, sadece butonlar çalışsın
+      if (idx === 2) return;
+
+      if (tapLock) return;
+      tapLock = true;
+      setTimeout(() => tapLock = false, 350);
+
       advance();
     }
-    document.addEventListener("pointerdown", globalTap, true);
-    document.addEventListener("click", globalTap, true);
-    document.addEventListener("touchstart", globalTap, {capture:true, passive:true});
+    document.addEventListener("pointerup", globalTap, true);
 
     // Hayır -> tamamen yok olsun
     noBtn.addEventListener("click", (e) => {

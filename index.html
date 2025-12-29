@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Merhaba Yeldanur</title>
 
-  <!-- Güzel font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,7 +15,6 @@
       --muted:rgba(246,247,255,.74);
       --glass:rgba(10,12,20,.55);
       --stroke:rgba(255,255,255,.14);
-      --accent:rgba(255,255,255,.10);
     }
 
     *{box-sizing:border-box}
@@ -31,14 +29,12 @@
                   linear-gradient(180deg, #02030a 0%, #060716 55%, #02020a 100%);
     }
 
-    /* YILDIZ CANVAS KATI */
     canvas#sky{
       position:fixed; inset:0;
       width:100%; height:100%;
       display:block;
     }
 
-    /* Hafif sis / vignette */
     .vignette{
       position:fixed; inset:-40px;
       background:
@@ -47,35 +43,81 @@
       pointer-events:none;
     }
 
-    /* Kayan yıldızlar (CSS) */
+    /* AY */
+    .moon{
+      position:fixed;
+      right: 7vw;
+      top: 8vh;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,.95) 0%, rgba(245,247,255,.92) 35%, rgba(210,220,255,.85) 60%, rgba(160,175,220,.55) 100%);
+      box-shadow:
+        0 0 30px rgba(220,230,255,.35),
+        0 0 70px rgba(180,205,255,.18);
+      filter: saturate(0.9);
+      pointer-events:none;
+      z-index:2;
+      opacity:.95;
+      overflow:hidden;
+    }
+    /* krater hissi */
+    .moon::before{
+      content:"";
+      position:absolute; inset:-10px;
+      background:
+        radial-gradient(circle at 35% 40%, rgba(120,140,190,.18) 0 10px, transparent 11px),
+        radial-gradient(circle at 65% 55%, rgba(120,140,190,.14) 0 14px, transparent 15px),
+        radial-gradient(circle at 55% 30%, rgba(120,140,190,.10) 0 8px, transparent 9px),
+        radial-gradient(circle at 30% 70%, rgba(120,140,190,.12) 0 12px, transparent 13px);
+      mix-blend-mode:multiply;
+      opacity:.55;
+      transform: rotate(10deg);
+    }
+    /* ayın gölgeli tarafı */
+    .moon::after{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(circle at 25% 35%, transparent 0 55%, rgba(0,0,0,.18) 75%, rgba(0,0,0,.35) 100%);
+      opacity:.55;
+    }
+
+    @media (max-width:420px){
+      .moon{ width:90px; height:90px; right:5vw; top:7vh; }
+    }
+
+    /* Kayan yıldızlar */
     .shooting-layer{
       position:fixed; inset:0;
       pointer-events:none;
       overflow:hidden;
+      z-index:1;
     }
     .shooting-star{
       position:absolute;
-      width:240px;
+      width:260px;
       height:2px;
       background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.95), rgba(255,255,255,0));
       filter: drop-shadow(0 0 10px rgba(255,255,255,.55));
       opacity:0;
       transform: rotate(-20deg);
-      animation: shoot 1.25s ease-in-out forwards;
+      animation: shoot 1.35s ease-in-out forwards;
     }
     @keyframes shoot{
       0%   { opacity:0; transform: translate3d(0,0,0) rotate(-20deg); }
       10%  { opacity:1; }
-      100% { opacity:0; transform: translate3d(520px, 260px, 0) rotate(-20deg); }
+      100% { opacity:0; transform: translate3d(560px, 280px, 0) rotate(-20deg); }
     }
 
-    /* Orta kart */
+    /* Kart */
     .wrap{
       position:relative;
       height:100%;
       display:grid;
       place-items:center;
       padding:24px;
+      z-index:3;
     }
     .card{
       width:min(720px, 92vw);
@@ -86,6 +128,8 @@
       padding:26px 22px 18px;
       box-shadow: 0 24px 80px rgba(0,0,0,.6);
       text-align:center;
+      cursor:pointer;
+      user-select:none;
     }
 
     .title{
@@ -94,14 +138,15 @@
       letter-spacing: .2px;
       margin: 6px 0 10px;
       text-shadow: 0 10px 40px rgba(0,0,0,.6);
+      min-height:46px;
     }
 
     .line{
       font-size: 20px;
       line-height: 1.55;
-      color: var(--txt);
       margin: 10px 0 14px;
       min-height: 84px;
+      white-space: pre-line;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -111,7 +156,6 @@
       font-size: 13px;
       color: var(--muted);
       margin-top: 6px;
-      user-select:none;
     }
 
     .row{
@@ -131,37 +175,13 @@
       cursor:pointer;
       font-size: 14px;
       transition: transform .18s ease, background .18s ease, opacity .18s ease;
-      user-select:none;
     }
+    .btn.primary{ background: rgba(255,255,255,.12); }
     .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); }
     .btn:active{ transform: translateY(0px) scale(.99); }
 
-    .btn.primary{
-      background: rgba(255,255,255,.12);
-    }
-
-    .controls{
-      position:fixed;
-      top:16px; right:16px;
-      display:flex; gap:10px;
-      z-index:5;
-    }
-
-    .tiny{
-      font-size:12px;
-      padding:10px 12px;
-      border-radius: 14px;
-    }
-
-    /* “Devam” alanı tıklanabilir */
-    .tap-area{
-      cursor:pointer;
-    }
-
-    /* Evet/Hayır alanı başlangıçta gizli */
     #choiceRow{ display:none; }
 
-    /* Mobilde metin biraz küçülsün */
     @media (max-width: 420px){
       .title{ font-size: 30px; }
       .line{ font-size: 18px; min-height: 92px; }
@@ -172,15 +192,11 @@
 <body>
   <canvas id="sky"></canvas>
   <div class="shooting-layer" id="shootingLayer"></div>
+  <div class="moon" aria-hidden="true"></div>
   <div class="vignette"></div>
 
-  <div class="controls">
-    <!-- Müzik istersen: repoya music.mp3 yükle -->
-    <button class="btn tiny" id="musicBtn">▶ Müzik</button>
-  </div>
-
   <main class="wrap">
-    <section class="card tap-area" id="tapArea">
+    <section class="card" id="tapArea">
       <div class="title" id="title">Merhaba Yeldanur</div>
       <div class="line" id="line"> </div>
       <div class="hint" id="hint">Devam etmek için tıkla ✨</div>
@@ -192,16 +208,19 @@
     </section>
   </main>
 
+  <!-- Repoya music.mp3 yükle -->
   <audio id="audio" loop>
     <source src="music.mp3" type="audio/mpeg" />
   </audio>
 
   <script>
-    /* ---------- YILDIZLI GÖKYÜZÜ (CANVAS) ---------- */
+    /* ---------- CANVAS YILDIZLAR ---------- */
     const canvas = document.getElementById("sky");
     const ctx = canvas.getContext("2d");
     let W, H, DPR;
     let stars = [];
+
+    function rand(min,max){ return Math.random()*(max-min)+min; }
 
     function resize(){
       DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -212,38 +231,35 @@
       makeStars();
     }
 
-    function rand(min,max){ return Math.random()*(max-min)+min; }
-
     function makeStars(){
-      const count = Math.floor((window.innerWidth * window.innerHeight) / 9000);
+      const count = Math.floor((window.innerWidth * window.innerHeight) / 8500);
       stars = Array.from({length: count}, () => ({
         x: Math.random()*W,
         y: Math.random()*H,
-        r: rand(0.6, 1.8) * DPR,
-        a: rand(0.15, 0.95),
-        tw: rand(0.004, 0.02),   // twinkle speed
-        ph: rand(0, Math.PI*2),  // phase
+        r: rand(0.6, 1.9) * DPR,
+        a: rand(0.18, 0.95),
+        tw: rand(0.004, 0.02),
+        ph: rand(0, Math.PI*2),
       }));
     }
 
     function draw(){
       ctx.clearRect(0,0,W,H);
 
-      // hafif nebula / bulut efekti
-      const g1 = ctx.createRadialGradient(W*0.25, H*0.2, 0, W*0.25, H*0.2, W*0.6);
+      // nebula
+      const g1 = ctx.createRadialGradient(W*0.22, H*0.18, 0, W*0.22, H*0.18, W*0.65);
       g1.addColorStop(0, "rgba(120,140,255,0.10)");
       g1.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
 
-      const g2 = ctx.createRadialGradient(W*0.75, H*0.7, 0, W*0.75, H*0.7, W*0.55);
+      const g2 = ctx.createRadialGradient(W*0.78, H*0.72, 0, W*0.78, H*0.72, W*0.60);
       g2.addColorStop(0, "rgba(90,255,220,0.07)");
       g2.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
 
-      // yıldızlar
       const t = performance.now();
       for(const s of stars){
-        const tw = (Math.sin(t*s.tw + s.ph) + 1) / 2; // 0..1
+        const tw = (Math.sin(t*s.tw + s.ph) + 1) / 2;
         const alpha = Math.min(1, s.a * (0.55 + tw*0.65));
 
         ctx.beginPath();
@@ -261,27 +277,22 @@
     resize();
     draw();
 
-    /* ---------- KAYAN YILDIZLAR ---------- */
+    /* ---------- KAYAN YILDIZ ---------- */
     const shootingLayer = document.getElementById("shootingLayer");
 
     function spawnShootingStar(){
       const star = document.createElement("div");
       star.className = "shooting-star";
-
-      // başlangıç noktası: üst-sol bölge
       const startX = Math.random() * (window.innerWidth * 0.55);
       const startY = Math.random() * (window.innerHeight * 0.35);
-
       star.style.left = startX + "px";
       star.style.top = startY + "px";
-
       shootingLayer.appendChild(star);
       star.addEventListener("animationend", () => star.remove());
     }
 
-    // 6-14 saniye arası rastgele aralıklarla
     function scheduleShooting(){
-      const delay = Math.floor(rand(6000, 14000));
+      const delay = Math.floor(rand(6500, 14000));
       setTimeout(() => {
         spawnShootingStar();
         scheduleShooting();
@@ -289,7 +300,7 @@
     }
     scheduleShooting();
 
-    /* ---------- METİN AKIŞI + BUTON MANTIĞI ---------- */
+    /* ---------- METİN + BUTON MANTIĞI ---------- */
     const titleEl = document.getElementById("title");
     const lineEl  = document.getElementById("line");
     const hintEl  = document.getElementById("hint");
@@ -297,6 +308,10 @@
     const choiceRow = document.getElementById("choiceRow");
     const yesBtn = document.getElementById("yesBtn");
     const noBtn  = document.getElementById("noBtn");
+
+    // Müzik: ilk tıkta başlasın
+    const audio = document.getElementById("audio");
+    let musicStarted = false;
 
     const scenes = [
       { title: "Merhaba Yeldanur", line: "", hint: "Devam etmek için tıkla ✨", choice: false },
@@ -311,21 +326,27 @@
       titleEl.textContent = s.title || " ";
       lineEl.textContent  = s.line || " ";
       hintEl.textContent  = s.hint || " ";
+      choiceRow.style.display = s.choice ? "flex" : "none";
+    }
 
-      if(s.choice){
-        choiceRow.style.display = "flex";
-      }else{
-        choiceRow.style.display = "none";
+    setScene(sceneIndex);
+
+    async function startMusicOnce(){
+      if(musicStarted) return;
+      try{
+        await audio.play();
+        musicStarted = true;
+      }catch(e){
+        // Bazı tarayıcılarda ilk tık bile yetmeyebilir; ikinci tıkta dener.
       }
     }
 
-    // ilk sahnede sadece başlık var, line boş kalsın
-    setScene(sceneIndex);
+    tapArea.addEventListener("click", async (e) => {
+      // butona tıklayınca kart click'i tetiklenmesin
+      if(e.target.tagName.toLowerCase() === "button") return;
 
-    // tıkla ilerle: seçim sahnesindeyken kart tıklaması ilerletmesin (butonlar var)
-    tapArea.addEventListener("click", (e) => {
-      const isButton = e.target.tagName.toLowerCase() === "button";
-      if(isButton) return;
+      // ilk tıkta müzik başlat
+      await startMusicOnce();
 
       if(sceneIndex < scenes.length - 1){
         sceneIndex++;
@@ -333,14 +354,13 @@
       }
     });
 
-    // EVET / HAYIR oyun mantığı
+    // EVET/HAYIR ölçek
     let yesScale = 1;
     let noScale  = 1;
 
     function applyScales(){
       yesBtn.style.transform = `scale(${yesScale})`;
       noBtn.style.transform  = `scale(${noScale})`;
-      // hayır çok küçülürse görünmez yap
       if(noScale <= 0.25){
         noBtn.style.opacity = "0";
         noBtn.style.pointerEvents = "none";
@@ -350,17 +370,17 @@
       }
     }
 
-    noBtn.addEventListener("click", (e) => {
+    noBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
-      // hayıra basınca: hayır küçül, evet büyü
+      await startMusicOnce();
       noScale  = Math.max(0.2, noScale * 0.78);
-      yesScale = Math.min(1.9, yesScale * 1.12);
+      yesScale = Math.min(1.95, yesScale * 1.12);
       applyScales();
     });
 
-    yesBtn.addEventListener("click", (e) => {
+    yesBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
-      // evete basınca final mesajı
+      await startMusicOnce();
       titleEl.textContent = "🤍";
       lineEl.textContent = "Tamam.\nİşin bittiğinde haber ver…\nBen geliyorum.";
       hintEl.textContent = "Bu sayfa burada kalsın 🙂";
@@ -368,25 +388,6 @@
     });
 
     applyScales();
-
-    /* ---------- MÜZİK (isteğe bağlı) ---------- */
-    const musicBtn = document.getElementById("musicBtn");
-    const audio = document.getElementById("audio");
-
-    async function toggleMusic(){
-      try{
-        if(audio.paused){
-          await audio.play();
-          musicBtn.textContent = "⏸ Müzik";
-        }else{
-          audio.pause();
-          musicBtn.textContent = "▶ Müzik";
-        }
-      }catch(err){
-        alert("Telefonda müzik kullanıcı dokunuşuyla başlar. Bir kez tıkla ve tekrar dene 🙂");
-      }
-    }
-    musicBtn.addEventListener("click", (e)=>{ e.stopPropagation(); toggleMusic(); });
   </script>
 </body>
 </html>

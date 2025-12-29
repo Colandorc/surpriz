@@ -46,7 +46,6 @@
       z-index:1;
     }
 
-    /* Ay */
     .moon{
       position:fixed;
       right: 7vw;
@@ -56,9 +55,7 @@
       border-radius: 50%;
       background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,.95) 0%, rgba(245,247,255,.92) 35%, rgba(210,220,255,.85) 60%, rgba(160,175,220,.55) 100%);
-      box-shadow:
-        0 0 30px rgba(220,230,255,.35),
-        0 0 70px rgba(180,205,255,.18);
+      box-shadow: 0 0 30px rgba(220,230,255,.35), 0 0 70px rgba(180,205,255,.18);
       opacity:.95;
       overflow:hidden;
       pointer-events:none;
@@ -102,22 +99,27 @@
       text-align:center;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
-      cursor:pointer; /* tıklanabilir hissi */
     }
 
     .title{
       font-family: "Playfair Display", serif;
-      font-size: 34px;             /* büyüttüm */
+      font-size: 34px;
       margin: 6px 0 12px;
       text-shadow: 0 10px 40px rgba(0,0,0,.6);
       min-height:44px;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .title.hidden{
+      opacity:0;
+      transform: translateY(-6px);
+      pointer-events:none;
     }
 
     .line{
-      font-size: 19px;             /* büyüttüm */
+      font-size: 19px;
       line-height: 1.7;
       margin: 6px 0 12px;
-      min-height: 110px;
+      min-height: 120px;
       white-space: pre-line;
       color: rgba(246,247,255,.88);
       display:flex;
@@ -128,7 +130,7 @@
     }
 
     .hint{
-      font-size: 14px;             /* büyüttüm */
+      font-size: 14px;
       color: var(--muted);
       margin-top: 4px;
       min-height:18px;
@@ -140,7 +142,6 @@
       justify-content:center;
       flex-wrap:wrap;
       margin-top:18px;
-      cursor:default; /* butonlarda normal imleç */
     }
 
     .btn{
@@ -150,7 +151,7 @@
       padding: 12px 18px;
       border-radius: 16px;
       cursor:pointer;
-      font-size: 15px;             /* büyüttüm */
+      font-size: 15px;
       transition: transform .18s ease, background .18s ease, opacity .18s ease;
     }
     .btn.primary{ background: rgba(255,255,255,.12); }
@@ -158,7 +159,6 @@
 
     #choiceRow{ display:none; }
 
-    /* küçük debug: istersen sil */
     #dbg{
       position:fixed;
       right:12px;
@@ -170,10 +170,9 @@
       pointer-events:none;
     }
 
-    /* Mobilde daha güzel oran */
     @media (max-width: 480px){
       .title{ font-size: 30px; }
-      .line{ font-size: 18px; min-height: 120px; }
+      .line{ font-size: 18px; min-height: 130px; }
     }
   </style>
 </head>
@@ -201,14 +200,12 @@
 
   <div id="dbg">[1/3]</div>
 
-  <!-- music.mp3 dosyası yoksa sorun değil -->
   <audio id="audio" loop>
     <source src="music.mp3" type="audio/mpeg" />
   </audio>
 
   <script>
-    /* ---------- SAHNE + TIK (KARTA BAĞLI = %100 ÇALIŞIR) ---------- */
-    const card = document.getElementById("card");
+    /* ---------- SAHNE + TIK (EN SAĞLAM HALİ) ---------- */
     const tTitle = document.getElementById("tTitle");
     const tLine  = document.getElementById("tLine");
     const tHint  = document.getElementById("tHint");
@@ -220,18 +217,23 @@
 
     const scenes = [
       { title:"Merhaba Yeldanur", line:"Devam etmek için tıkla ✨", hint:"", choice:false },
-      { title:"", line:"Bu aralar keyifsiz olduğunu biliyorum…\nVe yanında olmak istiyorum.", hint:"Devam etmek için tıkla", choice:false },
-      { title:"", line:"Bugün akşam işlerin bittiğinde…\n5 dakika bile olsa seni görmek ve yanında olmak istiyorum.", hint:"Seçimini yap 😊", choice:true },
+      { title:"", line:"Bu aralar keyifsiz olduğunu biliyorum…\nVe yanında olmak istiyorum.", hint:"(Devam etmek için tıkla)", choice:false },
+      { title:"", line:"Bugün akşam işlerin bittiğinde…\n5 dakika bile olsa seni görmek ve yanında olmak istiyorum.", hint:"(Seçimini yap)", choice:true },
     ];
     let idx = 0;
 
     function setScene(i){
       const s = scenes[i];
-      tTitle.textContent = (s.title && s.title.trim()) ? s.title : " ";
+
+      // başlık yoksa kaybolsun
+      const hasTitle = (s.title && s.title.trim());
+      tTitle.textContent = hasTitle ? s.title : " ";
+      tTitle.classList.toggle("hidden", !hasTitle);
+
       tLine.style.opacity = "0";
       setTimeout(() => {
-        tLine.textContent  = (s.line && s.line.trim()) ? s.line : " ";
-        tHint.textContent  = s.hint || " ";
+        tLine.textContent = s.line || " ";
+        tHint.textContent = s.hint || " ";
         choiceRow.style.display = s.choice ? "flex" : "none";
         dbg.textContent = `[${i+1}/${scenes.length}]`;
         tLine.style.opacity = "1";
@@ -239,10 +241,11 @@
     }
     setScene(idx);
 
+    // Müzik: ilk tıkta başlasın ama sahneyi ASLA bekletmesin
     let musicStarted = false;
-    async function startMusicOnce(){
+    function startMusicOnce(){
       if(musicStarted) return;
-      try { await audio.play(); musicStarted = true; } catch(e){ /* dosya yoksa / izin yoksa sorun değil */ }
+      audio.play().then(() => { musicStarted = true; }).catch(() => {});
     }
 
     function advance(){
@@ -256,27 +259,26 @@
       return e.target && e.target.closest && e.target.closest("button");
     }
 
-    async function handleCardTap(e){
+    // EKRANIN HER YERİNDEN YAKALA (CAPTURE) => kesin çalışır
+    function globalTap(e){
       if(isButtonTarget(e)) return;
-      await startMusicOnce();
+      startMusicOnce();
       advance();
     }
-
-    // PC + mobil garanti
-    card.addEventListener("click", handleCardTap);
-    card.addEventListener("touchstart", handleCardTap, {passive:true});
-    card.addEventListener("pointerdown", handleCardTap, {passive:true});
+    document.addEventListener("pointerdown", globalTap, true);
+    document.addEventListener("click", globalTap, true);
+    document.addEventListener("touchstart", globalTap, {capture:true, passive:true});
 
     // Hayır -> tamamen yok olsun
-    noBtn.addEventListener("click", async (e) => {
+    noBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      await startMusicOnce();
+      startMusicOnce();
       noBtn.remove();
-      yesBtn.style.transform = "scale(1.10)";
+      yesBtn.style.transform = "scale(1.12)";
       setTimeout(()=> yesBtn.style.transform = "scale(1)", 220);
     });
 
-    /* ---------- ARKAPLAN: YILDIZ + METEOR + HAVAİ FİŞEK (AYNI) ---------- */
+    /* ---------- ARKAPLAN: YILDIZ + METEOR + HAVAİ FİŞEK ---------- */
     function rand(min,max){ return Math.random()*(max-min)+min; }
 
     const sky = document.getElementById("sky"), sctx = sky.getContext("2d");
@@ -349,21 +351,18 @@
         len: rand(220, 360)*DPR,
       };
     }
-
     function scheduleMeteor(){
       setTimeout(() => { spawnMeteor(); scheduleMeteor(); }, rand(9000, 18000));
     }
 
     function drawMeteors(){
       mctx.clearRect(0,0,W,H);
-
       if(meteor){
         meteor.life--;
         meteor.x += meteor.vx * 6;
         meteor.y += meteor.vy * 6;
 
         const a = Math.max(0, meteor.life / meteor.max);
-
         const dx = meteor.vx, dy = meteor.vy;
         const mag = Math.hypot(dx,dy) || 1;
         const ux = dx/mag, uy = dy/mag;
@@ -395,11 +394,9 @@
 
         if(meteor.life <= 0) meteor = null;
       }
-
       requestAnimationFrame(drawMeteors);
     }
 
-    // Fireworks
     const particles = [];
     let fireworksOn = false;
 
@@ -436,7 +433,6 @@
         p.y += p.vy;
 
         const a = Math.max(0, p.life / p.max);
-
         fctx.beginPath();
         fctx.fillStyle = `hsla(${p.hue}, 90%, 70%, ${a})`;
         fctx.shadowBlur = 18 * DPR;
@@ -447,11 +443,8 @@
         if(p.life <= 0) particles.splice(i,1);
       }
 
-      if(fireworksOn || particles.length){
-        requestAnimationFrame(drawFireworks);
-      }else{
-        fctx.clearRect(0,0,W,H);
-      }
+      if(fireworksOn || particles.length) requestAnimationFrame(drawFireworks);
+      else fctx.clearRect(0,0,W,H);
     }
 
     function startFireworks(){
@@ -459,7 +452,6 @@
       fireworksOn = true;
 
       burst(W*0.55, H*0.35);
-
       const endAt = Date.now() + 5200;
       (function loop(){
         if(Date.now() > endAt){ fireworksOn = false; return; }
@@ -470,13 +462,12 @@
       drawFireworks();
     }
 
-    yesBtn.addEventListener("click", async (e) => {
+    yesBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      await startMusicOnce();
-
+      startMusicOnce();
       startFireworks();
-
       tTitle.textContent = "🤍";
+      tTitle.classList.remove("hidden");
       tLine.textContent  = "Tamam.\nİşin bittiğinde haber ver…\nBen geliyorum.";
       tHint.textContent  = " ";
       choiceRow.style.display = "none";
